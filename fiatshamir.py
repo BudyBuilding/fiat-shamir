@@ -1,5 +1,6 @@
 import random
 import hashlib
+import secrets
 from math import gcd
 from sympy import isprime, randprime
 
@@ -15,9 +16,7 @@ def fiat_shamir_proof(p, q, s):
         p (int): Egy nagy prímszám.
         q (int): Egy másik nagy prímszám.
         s (int): A titkos kulcs (gcd(s, n) = 1).
-    
-    Returns:
-        None: Csak kimenetet generál.
+
     """
     n = p * q  # Publikus modulus
     v = pow(s, 2, n)  # Verifier kulcs (v = s^2 mod n)
@@ -25,13 +24,13 @@ def fiat_shamir_proof(p, q, s):
     print(f"Verifier kulcs (v): {v} (számított: s^2 mod n)")
 
     # A bizonyító véletlenszerű értéket választ
-    r = random.randint(1, n - 1)
+    r = secrets.randbelow(n - 1)
     x = pow(r, 2, n)  # Publikus érték x = r^2 mod n
     print(f"\nBizonyító által választott véletlenszám (r): {r}")
     print(f"Publikusan megosztott érték (x): {x} (számított: r^2 mod n)")
-
+    k = secrets.randbelow(n - 1)
     # A hash függvény felhasználása a kihívás generálásához
-    c = hash_function(str(x)) % 2  # Kihívás értéke: c = hash(x) mod 2
+    c = hash_function(str(k)) % 2  # Kihívás értéke: c = hash(x) mod 2
     print(f"\nHash alapján generált kihívás (c): {c} (érték: hash(x) mod 2)")
 
     # A válasz kiszámítása
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     # Titkos kulcs generálása (relatív prím n-hez)
     n = p * q
     while True:
-        s = random.randint(2, n - 1)
+        s = secrets.randbelow(n - 1)
         if gcd(s, n) == 1:
             break
 
